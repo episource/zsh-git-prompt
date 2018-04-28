@@ -10,16 +10,16 @@ import sys
 gitsym = Popen(['git', 'symbolic-ref', 'HEAD'], stdout=PIPE, stderr=PIPE)
 branch, error = gitsym.communicate()
 
-error_string = error.decode('utf-8')
+error_string = error.decode('utf-8').lower()
 
-if 'fatal: Not a git repository' in error_string:
+if 'fatal' in error_string or 'not a git repository' in error_string:
 	sys.exit(0)
 
 branch = branch.decode("utf-8").strip()[11:]
 
 res, err = Popen(['git','diff','--name-status'], stdout=PIPE, stderr=PIPE).communicate()
 err_string = err.decode('utf-8')
-if 'fatal' in err_string:
+if 'fatal' in err_string.lower() or 'not a git repository' in error_string:
 	sys.exit(0)
 changed_files = [namestat[0] for namestat in res.decode("utf-8").splitlines()]
 staged_files = [namestat[0] for namestat in Popen(['git','diff', '--staged','--name-status'], stdout=PIPE).communicate()[0].splitlines()]
